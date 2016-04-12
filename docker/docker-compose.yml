@@ -1,3 +1,8 @@
+konsumentgrensesnitt:
+ image: "fint/ansatt-konsumentgrensesnitt-poc"
+ ports:
+  - "8080:8080"
+
 rabbitmq:
   hostname: "rabbitmq-poc"
   image: "rabbitmq:3-management"
@@ -7,3 +12,4 @@ rabbitmq:
   environment:
    RABBITMQ_DEFAULT_USER: "guest"
    RABBITMQ_DEFAULT_PASS: "guest"
+
