@@ -5,15 +5,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.fk.Ansatt;
 import no.skate.*;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/ansatte")
 @Api(tags = "Ansatte")
 public class AnsattController {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     List<Ansatt> ansatte;
 
     @PostConstruct
@@ -46,6 +51,11 @@ public class AnsattController {
         ansatte.add(pal);
     }
 
+    @RabbitListener(queues = "vaf-ut")
+    public void receiveResponse(byte[] content) {
+        log.info("Response: {}", new String(content));
+    }
+
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
     public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
@@ -64,6 +74,13 @@ public class AnsattController {
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
     public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id) {
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
+
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
+        rabbitTemplate.setReplyTimeout(30000);
+        Message response = rabbitTemplate.sendAndReceive("vaf-inn", new Message(("{\"identifikatortype\":\"" + identifikatortype + "\", \"id\":\"" + id + "\"}").getBytes(), messageProperties));
+        System.out.println(new String(response.getBody()));
+
         Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
         if (ansatt.isPresent())
             return ansatt.get();
@@ -92,8 +109,10 @@ public class AnsattController {
         Optional<Ansatt> existingAnsatt = findAnsatt(type, verdi);
         if (existingAnsatt.isPresent()) {
             KontaktInformasjon kontaktInformasjon = existingAnsatt.get().getKontaktInformasjon();
-            if (kontaktInformasjon == null)
-                existingAnsatt.get().setKontaktInformasjon(new KontaktInformasjon());
+            if (kontaktInformasjon == null) {
+                kontaktInformasjon = new KontaktInformasjon();
+                existingAnsatt.get().setKontaktInformasjon(kontaktInformasjon);
+            }
 
             kontaktInformasjon.setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
         }
