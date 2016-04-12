@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -46,45 +48,39 @@ public class AnsattController {
 
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) String navn) {
+    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
         log.info("hentAnsatte - navn: {}", navn);
         if (navn == null) {
             return ansatte;
         } else {
-            List<Ansatt> ansattListe = new ArrayList<>();
-            navn = navn.toLowerCase();
-            for (Ansatt ansatt : ansatte) {
+            return ansatte.stream().filter(ansatt -> {
                 String fornavn = ansatt.getNavn().getFornavn().toLowerCase();
                 String etternavn = ansatt.getNavn().getEtternavn().toLowerCase();
-                if (navn.equals(fornavn) || navn.equals(etternavn))
-                    ansattListe.add(ansatt);
-            }
-            return ansattListe;
+                return (navn.equals(fornavn) || navn.equals(etternavn));
+            }).collect(Collectors.toList());
         }
     }
 
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
     public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id) {
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
-        Ansatt ansatt = findAnsatt(identifikatortype, id);
-        if (ansatt != null)
-            return ansatt;
+        Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
+        if (ansatt.isPresent())
+            return ansatt.get();
 
         return new Ansatt();
     }
 
-    private Ansatt findAnsatt(String identifikatortype, String id) {
-        for (Ansatt ansatt : ansatte) {
+    private Optional<Ansatt> findAnsatt(String identifikatortype, String id) {
+        return ansatte.stream().filter(ansatt -> {
             if (ansatt.getIdentifikator() != null) {
                 String type = ansatt.getIdentifikator().getIdentifikatorType();
                 String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
 
-                if (identifikatortype.equals(type) && id.equals(verdi)) {
-                    return ansatt;
-                }
+                return (identifikatortype.equals(type) && id.equals(verdi));
             }
-        }
-        return null;
+            return false;
+        }).findFirst();
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -93,12 +89,13 @@ public class AnsattController {
 
         String type = ansatt.getIdentifikator().getIdentifikatorType();
         String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
-        Ansatt existingAnsatt = findAnsatt(type, verdi);
-        if (existingAnsatt != null) {
-            if (existingAnsatt.getKontaktInformasjon() == null)
-                existingAnsatt.setKontaktInformasjon(new KontaktInformasjon());
+        Optional<Ansatt> existingAnsatt = findAnsatt(type, verdi);
+        if (existingAnsatt.isPresent()) {
+            KontaktInformasjon kontaktInformasjon = existingAnsatt.get().getKontaktInformasjon();
+            if (kontaktInformasjon == null)
+                existingAnsatt.get().setKontaktInformasjon(new KontaktInformasjon());
 
-            existingAnsatt.getKontaktInformasjon().setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
+            kontaktInformasjon.setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
         }
     }
 }
