@@ -1,5 +1,5 @@
 spring:
- rabbitmq:
-   username:
-   password:
-   host:
+  rabbitmq:
+   username: guest
+   password: guest
+   host: 152.93.120.130

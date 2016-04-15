@@ -4,11 +4,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.fk.Ansatt;
+import no.fk.fint.Rabbit;
 import no.skate.*;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.amqp.core.MessageProperties;
+//import org.springframework.amqp.rabbit.annotation.RabbitListener;
+//import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/ansatte")
 @Api(tags = "Ansatte")
 public class AnsattController {
+    //@Autowired
+    //private RabbitTemplate rabbitTemplate;
+
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private Rabbit rabbit;
 
     List<Ansatt> ansatte;
 
@@ -51,15 +56,19 @@ public class AnsattController {
         ansatte.add(pal);
     }
 
+    /*
     @RabbitListener(queues = "vaf-ut")
     public void receiveResponse(byte[] content) {
         log.info("Response: {}", new String(content));
     }
+    */
 
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
+    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn, @RequestHeader Map<String, String> headers) {
         log.info("hentAnsatte - navn: {}", navn);
+        log.info("OrgID: {}", getOrgID(headers));
+        log.info("Queue: {}", getQueue(getOrgID(headers)));
         if (navn == null) {
             return ansatte;
         } else {
@@ -72,14 +81,30 @@ public class AnsattController {
     }
 
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
-    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id) {
+    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id, @RequestHeader Map<String, String> headers) {
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
 
+        String orgID = getOrgID(headers);
+        String queue = getQueue(orgID);
+
+        log.info("OrgID: {}", orgID);
+        log.info("Queue: {}", queue);
+
+        rabbit.setQueue(queue);
+        Message response = rabbit.SendAndReceive("Hello world!");
+        //log.info("Response: {}", response.getBody());
+
+
+
+
+
+        /*
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
-        rabbitTemplate.setReplyTimeout(30000);
-        Message response = rabbitTemplate.sendAndReceive("vaf-inn", new Message(("{\"identifikatortype\":\"" + identifikatortype + "\", \"id\":\"" + id + "\"}").getBytes(), messageProperties));
-        System.out.println(new String(response.getBody()));
+        rabbitTemplate.setReplyTimeout(3);
+        Message response = rabbitTemplate.sendAndReceive("fint:vaf.no:ansatt", new Message(("{\"identifikatortype\":\"" + identifikatortype + "\", \"id\":\"" + id + "\"}").getBytes(), messageProperties));
+        //System.out.println(new String(response.getBody()));
+        */
 
         Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
         if (ansatt.isPresent())
@@ -117,4 +142,13 @@ public class AnsattController {
             kontaktInformasjon.setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
         }
     }
+
+    private String getOrgID(Map<String, String> headers) {
+        return headers.get("x-org-id");
+    }
+
+    private String getQueue(String orgID) {
+        return String.format("fint:%s:ansatt", orgID);
+    }
+
 }
