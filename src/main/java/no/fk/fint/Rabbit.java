@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Scope(value = "singleton")
 public class Rabbit {
 
     @Autowired

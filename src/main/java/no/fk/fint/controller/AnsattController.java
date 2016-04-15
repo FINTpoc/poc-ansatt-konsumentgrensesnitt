@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.fk.Ansatt;
+import no.fk.fint.QueueFactory;
 import no.fk.fint.Rabbit;
 import no.skate.*;
 import org.springframework.amqp.core.Message;
@@ -12,6 +13,7 @@ import org.springframework.amqp.core.Message;
 //import org.springframework.amqp.rabbit.core.RabbitTemplate;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -65,10 +67,10 @@ public class AnsattController {
 
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn, @RequestHeader Map<String, String> headers) {
+    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
         log.info("hentAnsatte - navn: {}", navn);
-        log.info("OrgID: {}", getOrgID(headers));
-        log.info("Queue: {}", getQueue(getOrgID(headers)));
+
+
         if (navn == null) {
             return ansatte;
         } else {
@@ -81,22 +83,20 @@ public class AnsattController {
     }
 
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
-    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id, @RequestHeader Map<String, String> headers) {
+    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id, @RequestHeader("x-org-id") String orgID) {
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
 
-        String orgID = getOrgID(headers);
-        String queue = getQueue(orgID);
+        //String orgID = getOrgID(headers);
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+
 
         log.info("OrgID: {}", orgID);
-        log.info("Queue: {}", queue);
+        log.info(queueFactory.getInQueue());
+        log.info(queueFactory.getOutQueue());
 
-        rabbit.setQueue(queue);
+        rabbit.setQueue(queueFactory.getInQueue());
         Message response = rabbit.SendAndReceive("Hello world!");
-        //log.info("Response: {}", response.getBody());
-
-
-
-
 
         /*
         MessageProperties messageProperties = new MessageProperties();
@@ -143,12 +143,8 @@ public class AnsattController {
         }
     }
 
-    private String getOrgID(Map<String, String> headers) {
-        return headers.get("x-org-id");
-    }
 
-    private String getQueue(String orgID) {
-        return String.format("fint:%s:ansatt", orgID);
-    }
+
+
 
 }
