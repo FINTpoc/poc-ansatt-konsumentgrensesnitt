@@ -12,6 +12,7 @@ import org.springframework.amqp.core.Message;
 //import org.springframework.amqp.rabbit.annotation.RabbitListener;
 //import org.springframework.amqp.rabbit.core.RabbitTemplate;
 //import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/ansatte")
 @Api(tags = "Ansatte")
 public class AnsattController {
-    //@Autowired
-    //private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private Rabbit rabbit;
+    private ObjectFactory<Rabbit> rabbit;
 
     List<Ansatt> ansatte;
+
 
     @PostConstruct
     public void init() throws ParseException {
@@ -58,18 +58,17 @@ public class AnsattController {
         ansatte.add(pal);
     }
 
-    /*
-    @RabbitListener(queues = "vaf-ut")
-    public void receiveResponse(byte[] content) {
-        log.info("Response: {}", new String(content));
-    }
-    */
-
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
+    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("hentAnsatte - navn: {}", navn);
 
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("hentAnsatte");
 
         if (navn == null) {
             return ansatte;
@@ -84,27 +83,14 @@ public class AnsattController {
 
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
     public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
 
-        //String orgID = getOrgID(headers);
         QueueFactory queueFactory = new QueueFactory(orgID);
 
-
-
-        log.info("OrgID: {}", orgID);
-        log.info(queueFactory.getInQueue());
-        log.info(queueFactory.getOutQueue());
-
-        rabbit.setQueue(queueFactory.getInQueue());
-        Message response = rabbit.SendAndReceive("Hello world!");
-
-        /*
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
-        rabbitTemplate.setReplyTimeout(3);
-        Message response = rabbitTemplate.sendAndReceive("fint:vaf.no:ansatt", new Message(("{\"identifikatortype\":\"" + identifikatortype + "\", \"id\":\"" + id + "\"}").getBytes(), messageProperties));
-        //System.out.println(new String(response.getBody()));
-        */
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("hentAnsatt");
 
         Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
         if (ansatt.isPresent())
@@ -114,6 +100,8 @@ public class AnsattController {
     }
 
     private Optional<Ansatt> findAnsatt(String identifikatortype, String id) {
+        log.info("findAnsatt");
+
         return ansatte.stream().filter(ansatt -> {
             if (ansatt.getIdentifikator() != null) {
                 String type = ansatt.getIdentifikator().getIdentifikatorType();
@@ -126,8 +114,15 @@ public class AnsattController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public void oppdaterAnsatt(@RequestBody Ansatt ansatt) {
+    public void oppdaterAnsatt(@RequestBody Ansatt ansatt, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("oppdaterAnsatt - {}", ansatt);
+
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("oppdaterAnsatt");
 
         String type = ansatt.getIdentifikator().getIdentifikatorType();
         String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
