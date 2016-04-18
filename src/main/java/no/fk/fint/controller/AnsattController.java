@@ -8,19 +8,23 @@ import no.fk.fint.QueueFactory;
 import no.fk.fint.Rabbit;
 import no.skate.*;
 import org.springframework.amqp.core.Message;
-//import org.springframework.amqp.core.MessageProperties;
-//import org.springframework.amqp.rabbit.annotation.RabbitListener;
-//import org.springframework.amqp.rabbit.core.RabbitTemplate;
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+//import org.springframework.amqp.core.MessageProperties;
+//import org.springframework.amqp.rabbit.annotation.RabbitListener;
+//import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @RestController
@@ -43,10 +47,10 @@ public class AnsattController {
         Date fodselsdato = dateFormat.parse("27/12-1971");
 
         Ansatt ole = new Ansatt(new Personnavn("Ole", "Olsen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.ENKE_ELLER_ENKEMANN);
-        ole.setIdentifikator(new Identifikator("fodselsnummer", "12345678901"));
+        ole.addIdentifikator(new Identifikator("fodselsnummer", "12345678901"));
 
         Ansatt mari = new Ansatt(new Personnavn("Mari", "Hansen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.GIFT);
-        mari.setIdentifikator(new Identifikator("ansattnummer", "123"));
+        mari.addIdentifikator(new Identifikator("ansattnummer", "123"));
 
         Ansatt trine = new Ansatt(new Personnavn("Trine", "Johansen"), Kjonn.KVINNE, Landkode.SE, fodselsdato, Sivilstand.GJENLEVENDE_PARTNER);
         Ansatt line = new Ansatt(new Personnavn("Line", "Svendsen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.SKILT);
@@ -66,10 +70,9 @@ public class AnsattController {
     */
 
     @ApiOperation("Henter alle ansatte")
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
-        log.info("hentAnsatte - navn: {}", navn);
-
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<Ansatt> getAnsatte(@RequestParam(required = false) final String navn) {
+        log.info("getAnsatte - navn: {}", navn);
 
         if (navn == null) {
             return ansatte;
@@ -88,7 +91,6 @@ public class AnsattController {
 
         //String orgID = getOrgID(headers);
         QueueFactory queueFactory = new QueueFactory(orgID);
-
 
 
         log.info("OrgID: {}", orgID);
@@ -115,9 +117,10 @@ public class AnsattController {
 
     private Optional<Ansatt> findAnsatt(String identifikatortype, String id) {
         return ansatte.stream().filter(ansatt -> {
-            if (ansatt.getIdentifikator() != null) {
-                String type = ansatt.getIdentifikator().getIdentifikatorType();
-                String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
+            if (ansatt.getIdentifikatorer().size() > 0) {
+                Identifikator identifikator = ansatt.getIdentifikatorer().get(0);
+                String type = identifikator.getIdentifikatortype();
+                String verdi = identifikator.getIdentifikatorverdi();
 
                 return (identifikatortype.equals(type) && id.equals(verdi));
             }
@@ -129,22 +132,20 @@ public class AnsattController {
     public void oppdaterAnsatt(@RequestBody Ansatt ansatt) {
         log.info("oppdaterAnsatt - {}", ansatt);
 
-        String type = ansatt.getIdentifikator().getIdentifikatorType();
-        String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
+        Identifikator identifikator = ansatt.getIdentifikatorer().get(0);
+        String type = identifikator.getIdentifikatortype();
+        String verdi = identifikator.getIdentifikatorverdi();
         Optional<Ansatt> existingAnsatt = findAnsatt(type, verdi);
         if (existingAnsatt.isPresent()) {
-            KontaktInformasjon kontaktInformasjon = existingAnsatt.get().getKontaktInformasjon();
-            if (kontaktInformasjon == null) {
-                kontaktInformasjon = new KontaktInformasjon();
-                existingAnsatt.get().setKontaktInformasjon(kontaktInformasjon);
+            Kontaktinformasjon kontaktinformasjon = existingAnsatt.get().getKontaktinformasjon();
+            if (kontaktinformasjon == null) {
+                kontaktinformasjon = new Kontaktinformasjon();
+                existingAnsatt.get().setKontaktinformasjon(kontaktinformasjon);
             }
 
-            kontaktInformasjon.setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
+            kontaktinformasjon.setEpostadresse(ansatt.getKontaktinformasjon().getEpostadresse());
         }
     }
-
-
-
 
 
 }

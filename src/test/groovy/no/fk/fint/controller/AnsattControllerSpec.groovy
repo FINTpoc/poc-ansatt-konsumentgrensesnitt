@@ -2,7 +2,7 @@ package no.fk.fint.controller
 
 import no.fk.Ansatt
 import no.fk.fint.Application
-import no.skate.KontaktInformasjon
+import no.skate.Kontaktinformasjon
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.SpringApplicationConfiguration
@@ -55,9 +55,9 @@ class AnsattControllerSpec extends Specification {
         given:
         def ansatt = ansattController.ansatte.get(0)
 
-        def kontaktInformasjon = new KontaktInformasjon()
-        kontaktInformasjon.setEpostadresse("ole.olsen@fint.no")
-        ansatt.setKontaktInformasjon(kontaktInformasjon)
+        def kontaktinformasjon = new Kontaktinformasjon()
+        kontaktinformasjon.setEpostadresse("ole.olsen@fint.no")
+        ansatt.setKontaktinformasjon(kontaktinformasjon)
 
         when:
         def response = new TestRestTemplate().exchange("http://localhost:${port}/ansatte", HttpMethod.PUT, new HttpEntity<>(ansatt), Ansatt)
