@@ -9,6 +9,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.boot.test.TestRestTemplate
 import org.springframework.boot.test.WebIntegrationTest
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
@@ -24,22 +25,29 @@ class AnsattControllerSpec extends Specification {
     private int port
 
     def "Hent alle ansatte"() {
+        given:
+        HttpHeaders headers = new HttpHeaders()
+        headers.add("x-org-id", "test-org")
+
         when:
-        def ansatte = new TestRestTemplate().getForObject("http://localhost:${port}/ansatte", Ansatt[])
+        def response = new TestRestTemplate().exchange("http://localhost:${port}/ansatte", HttpMethod.GET, new HttpEntity(headers), Ansatt[])
 
         then:
-        ansatte != null
-        ansatte.length == 5
+        response.statusCode == HttpStatus.OK
+        response.getBody().length == 5
     }
 
     def "Søk etter ansatte med navn"() {
+        given:
+        HttpHeaders headers = new HttpHeaders()
+        headers.add("x-org-id", "test-org")
+
         when:
-        def ansatte = new TestRestTemplate().getForObject("http://localhost:${port}/ansatte?navn=ole", Ansatt[])
+        def response = new TestRestTemplate().exchange("http://localhost:${port}/ansatte?navn=ole", HttpMethod.GET, new HttpEntity(headers), Ansatt[])
 
         then:
-        ansatte != null
-        ansatte.length == 1
-        ansatte[0].getNavn().getFornavn() == "Ole"
+        response.statusCode == HttpStatus.OK
+        response.getBody()[0].navn.fornavn == "Ole"
     }
 
     def "Hent ansatt"() {
@@ -53,6 +61,8 @@ class AnsattControllerSpec extends Specification {
 
     def "Oppdater ansatt"() {
         given:
+        HttpHeaders headers = new HttpHeaders()
+        headers.add("x-org-id", "test-org")
         def ansatt = ansattController.ansatte.get(0)
 
         def kontaktinformasjon = new Kontaktinformasjon()
@@ -60,7 +70,7 @@ class AnsattControllerSpec extends Specification {
         ansatt.setKontaktinformasjon(kontaktinformasjon)
 
         when:
-        def response = new TestRestTemplate().exchange("http://localhost:${port}/ansatte", HttpMethod.PUT, new HttpEntity<>(ansatt), Ansatt)
+        def response = new TestRestTemplate().exchange("http://localhost:${port}/ansatte", HttpMethod.PUT, new HttpEntity(ansatt, headers), Ansatt)
 
         then:
         response.statusCode == HttpStatus.OK

@@ -1,16 +1,18 @@
 package no.fk.fint;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
+@Scope("prototype")
 public class Rabbit {
 
     @Autowired
@@ -22,21 +24,16 @@ public class Rabbit {
 
     public Rabbit() {
 
-        //rabbitTemplate = new RabbitTemplate();
         messageProperties = new MessageProperties();
         messageProperties.setCorrelationId(UUID.randomUUID().toString().getBytes());
         replyTimeout = 0;
-        queue = "fint:default:ansatt";
     }
 
     public Message SendAndReceive(String event) {
 
         rabbitTemplate.setReplyTimeout(replyTimeout);
         Message message = new Message(event.getBytes(), messageProperties);
-        log.info(message.toString());
-
         Message response = rabbitTemplate.sendAndReceive(queue, message);
-        //Message response = null;
 
         return response;
     }
