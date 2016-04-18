@@ -4,16 +4,23 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.fk.Ansatt;
+import no.fk.fint.QueueFactory;
+import no.fk.fint.Rabbit;
 import no.skate.*;
+import org.springframework.amqp.core.Message;
+//import org.springframework.amqp.core.MessageProperties;
+//import org.springframework.amqp.rabbit.annotation.RabbitListener;
+//import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,7 +28,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/ansatte")
 @Api(tags = "Ansatte")
 public class AnsattController {
+
+    @Autowired
+    private ObjectFactory<Rabbit> rabbit;
+
     List<Ansatt> ansatte;
+
 
     @PostConstruct
     public void init() throws ParseException {
@@ -48,8 +60,16 @@ public class AnsattController {
 
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn) {
+    public List<Ansatt> hentAnsatte(@RequestParam(required = false) final String navn, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("hentAnsatte - navn: {}", navn);
+
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("hentAnsatte");
+
         if (navn == null) {
             return ansatte;
         } else {
@@ -62,8 +82,16 @@ public class AnsattController {
     }
 
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
-    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id) {
+    public Ansatt hentAnsatt(@PathVariable String identifikatortype, @PathVariable String id, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("hentAnsatt - identifikatorType: {}, id: {}", identifikatortype, id);
+
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("hentAnsatt");
+
         Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
         if (ansatt.isPresent())
             return ansatt.get();
@@ -72,6 +100,8 @@ public class AnsattController {
     }
 
     private Optional<Ansatt> findAnsatt(String identifikatortype, String id) {
+        log.info("findAnsatt");
+
         return ansatte.stream().filter(ansatt -> {
             if (ansatt.getIdentifikator() != null) {
                 String type = ansatt.getIdentifikator().getIdentifikatorType();
@@ -84,18 +114,32 @@ public class AnsattController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public void oppdaterAnsatt(@RequestBody Ansatt ansatt) {
+    public void oppdaterAnsatt(@RequestBody Ansatt ansatt, @RequestHeader("x-org-id") String orgID) {
+        log.info("OrgID: {}", orgID);
         log.info("oppdaterAnsatt - {}", ansatt);
+
+        QueueFactory queueFactory = new QueueFactory(orgID);
+
+        Rabbit instance = rabbit.getObject();
+        instance.setQueue(queueFactory.getInQueue());
+        Message response = instance.SendAndReceive("oppdaterAnsatt");
 
         String type = ansatt.getIdentifikator().getIdentifikatorType();
         String verdi = ansatt.getIdentifikator().getIdentifikatorVerdi();
         Optional<Ansatt> existingAnsatt = findAnsatt(type, verdi);
         if (existingAnsatt.isPresent()) {
             KontaktInformasjon kontaktInformasjon = existingAnsatt.get().getKontaktInformasjon();
-            if (kontaktInformasjon == null)
-                existingAnsatt.get().setKontaktInformasjon(new KontaktInformasjon());
+            if (kontaktInformasjon == null) {
+                kontaktInformasjon = new KontaktInformasjon();
+                existingAnsatt.get().setKontaktInformasjon(kontaktInformasjon);
+            }
 
             kontaktInformasjon.setEpostadresse(ansatt.getKontaktInformasjon().getEpostadresse());
         }
     }
+
+
+
+
+
 }
