@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
+@CrossOrigin(origins = "http://localhost:9000")
 @RequestMapping(value = "/ansatte", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 @Api(tags = "Ansatte")
 public class AnsattController {
@@ -48,13 +49,23 @@ public class AnsattController {
 
         Ansatt ole = new Ansatt(new Personnavn("Ole", "Olsen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.ENKE_ELLER_ENKEMANN);
         ole.addIdentifikator(new Identifikator("fodselsnummer", "12345678901"));
+        Kontaktinformasjon oleKI = new Kontaktinformasjon();
+        oleKI.setEpostadresse("ole.olsen@gmail.com");
+        oleKI.setMobiltelefonnummer("90909090");
+        ole.setKontaktinformasjon(oleKI);
+        ole.setAvdeling("IKT avdelingen");
 
         Ansatt mari = new Ansatt(new Personnavn("Mari", "Hansen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.GIFT);
         mari.addIdentifikator(new Identifikator("ansattnummer", "123"));
+        mari.setAvdeling("Personalavdelingen");
 
         Ansatt trine = new Ansatt(new Personnavn("Trine", "Johansen"), Kjonn.KVINNE, Landkode.SE, fodselsdato, Sivilstand.GJENLEVENDE_PARTNER);
+        trine.setAvdeling("Skeisvang videregående skole");
         Ansatt line = new Ansatt(new Personnavn("Line", "Svendsen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.SKILT);
+        line.setAvdeling("Seksjon for kvalitet, analyse og dimensjonering");
         Ansatt pal = new Ansatt(new Personnavn("Pål", "Persen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.GIFT);
+        pal.setAvdeling("Rådmannens stab");
+
         ansatte.add(ole);
         ansatte.add(mari);
         ansatte.add(trine);
@@ -80,7 +91,9 @@ public class AnsattController {
             return ansatte.stream().filter(ansatt -> {
                 String fornavn = ansatt.getNavn().getFornavn().toLowerCase();
                 String etternavn = ansatt.getNavn().getEtternavn().toLowerCase();
-                return (navn.equals(fornavn) || navn.equals(etternavn));
+                String fulltNavn = String.format("%s %s", fornavn, etternavn);
+                //return (navn.equals(fornavn) || navn.equals(etternavn));
+                return (fulltNavn.contains(navn));
             }).collect(Collectors.toList());
         }
     }
