@@ -1,6 +1,4 @@
-package no.fk.fint;
-
-import org.springframework.stereotype.Component;
+package no.fk.fint.messaging;
 
 /**
  * Created by FSjovatsen on 15.04.2016.

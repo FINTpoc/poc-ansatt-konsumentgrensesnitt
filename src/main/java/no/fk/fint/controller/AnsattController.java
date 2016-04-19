@@ -4,10 +4,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.fk.Ansatt;
-import no.fk.fint.QueueFactory;
-import no.fk.fint.Rabbit;
+import no.fk.event.Event;
+import no.fk.fint.messaging.MessageBroker;
+import no.fk.fint.messaging.QueueFactory;
 import no.skate.*;
-import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,8 +23,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 //import org.springframework.amqp.core.MessageProperties;
-//import org.springframework.amqp.rabbit.annotation.RabbitListener;
-//import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.amqp.messageBroker.annotation.RabbitListener;
+//import org.springframework.amqp.messageBroker.core.RabbitTemplate;
 //import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
@@ -35,42 +35,42 @@ import java.util.stream.Collectors;
 public class AnsattController {
 
     @Autowired
-    private ObjectFactory<Rabbit> rabbit;
+    private ObjectFactory<MessageBroker> messageBroker;
 
     List<Ansatt> ansatte;
 
 
     @PostConstruct
     public void init() throws ParseException {
-        ansatte = new ArrayList<>();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM-yyyy");
-        Date fodselsdato = dateFormat.parse("27/12-1971");
-
-        Ansatt ole = new Ansatt(new Personnavn("Ole", "Olsen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.ENKE_ELLER_ENKEMANN);
-        ole.addIdentifikator(new Identifikator("fodselsnummer", "12345678901"));
-        Kontaktinformasjon oleKI = new Kontaktinformasjon();
-        oleKI.setEpostadresse("ole.olsen@gmail.com");
-        oleKI.setMobiltelefonnummer("90909090");
-        ole.setKontaktinformasjon(oleKI);
-        ole.setAvdeling("IKT avdelingen");
-
-        Ansatt mari = new Ansatt(new Personnavn("Mari", "Hansen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.GIFT);
-        mari.addIdentifikator(new Identifikator("ansattnummer", "123"));
-        mari.setAvdeling("Personalavdelingen");
-
-        Ansatt trine = new Ansatt(new Personnavn("Trine", "Johansen"), Kjonn.KVINNE, Landkode.SE, fodselsdato, Sivilstand.GJENLEVENDE_PARTNER);
-        trine.setAvdeling("Skeisvang videregående skole");
-        Ansatt line = new Ansatt(new Personnavn("Line", "Svendsen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.SKILT);
-        line.setAvdeling("Seksjon for kvalitet, analyse og dimensjonering");
-        Ansatt pal = new Ansatt(new Personnavn("Pål", "Persen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.GIFT);
-        pal.setAvdeling("Rådmannens stab");
-
-        ansatte.add(ole);
-        ansatte.add(mari);
-        ansatte.add(trine);
-        ansatte.add(line);
-        ansatte.add(pal);
+//        ansatte = new ArrayList<>();
+//
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM-yyyy");
+//        Date fodselsdato = dateFormat.parse("27/12-1971");
+//
+//        Ansatt ole = new Ansatt(new Personnavn("Ole", "Olsen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.ENKE_ELLER_ENKEMANN);
+//        ole.addIdentifikator(new Identifikator("fodselsnummer", "12345678901"));
+//        Kontaktinformasjon oleKI = new Kontaktinformasjon();
+//        oleKI.setEpostadresse("ole.olsen@gmail.com");
+//        oleKI.setMobiltelefonnummer("90909090");
+//        ole.setKontaktinformasjon(oleKI);
+//        ole.setAvdeling("IKT avdelingen");
+//
+//        Ansatt mari = new Ansatt(new Personnavn("Mari", "Hansen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.GIFT);
+//        mari.addIdentifikator(new Identifikator("ansattnummer", "123"));
+//        mari.setAvdeling("Personalavdelingen");
+//
+//        Ansatt trine = new Ansatt(new Personnavn("Trine", "Johansen"), Kjonn.KVINNE, Landkode.SE, fodselsdato, Sivilstand.GJENLEVENDE_PARTNER);
+//        trine.setAvdeling("Skeisvang videregående skole");
+//        Ansatt line = new Ansatt(new Personnavn("Line", "Svendsen"), Kjonn.KVINNE, Landkode.NO, fodselsdato, Sivilstand.SKILT);
+//        line.setAvdeling("Seksjon for kvalitet, analyse og dimensjonering");
+//        Ansatt pal = new Ansatt(new Personnavn("Pål", "Persen"), Kjonn.MANN, Landkode.NO, fodselsdato, Sivilstand.GIFT);
+//        pal.setAvdeling("Rådmannens stab");
+//
+//        ansatte.add(ole);
+//        ansatte.add(mari);
+//        ansatte.add(trine);
+//        ansatte.add(line);
+//        ansatte.add(pal);
     }
 
     @ApiOperation("Henter alle ansatte")
@@ -81,9 +81,9 @@ public class AnsattController {
 
         QueueFactory queueFactory = new QueueFactory(orgID);
 
-        /*Rabbit instance = rabbit.getObject();
-        instance.setQueue(queueFactory.getInQueue());
-        Message response = instance.SendAndReceive("hentAnsatte");*/
+        /*Rabbit instance = messageBroker.getObject();
+        instance.setRoute(queueFactory.getInQueue());
+        Message response = instance.sendAndReceive("hentAnsatte");*/
 
         if (navn == null) {
             return ansatte;
@@ -105,9 +105,9 @@ public class AnsattController {
 
         QueueFactory queueFactory = new QueueFactory(orgID);
 
-        Rabbit instance = rabbit.getObject();
-        instance.setQueue(queueFactory.getInQueue());
-        Message response = instance.SendAndReceive("hentAnsatt");
+        MessageBroker instance = messageBroker.getObject();
+        instance.setRoute(queueFactory.getInQueue());
+        String response = instance.sendAndReceive(new Event<>());
 
         Optional<Ansatt> ansatt = findAnsatt(identifikatortype, id);
         if (ansatt.isPresent())
@@ -138,9 +138,9 @@ public class AnsattController {
 
         QueueFactory queueFactory = new QueueFactory(orgID);
 
-        /*Rabbit instance = rabbit.getObject();
-        instance.setQueue(queueFactory.getInQueue());
-        Message response = instance.SendAndReceive("oppdaterAnsatt");*/
+        /*Rabbit instance = messageBroker.getObject();
+        instance.setRoute(queueFactory.getInQueue());
+        Message response = instance.sendAndReceive("oppdaterAnsatt");*/
 
         Identifikator identifikator = ansatt.getIdentifikatorer().get(0);
         String type = identifikator.getIdentifikatortype();
