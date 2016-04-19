@@ -1,9 +1,5 @@
 package no.fk.fint.messaging;
 
-/**
- * Created by FSjovatsen on 15.04.2016.
- */
-
 public class QueueFactory {
 
     private final String inQueueTemplate = "fint:%s:ansatt:in";

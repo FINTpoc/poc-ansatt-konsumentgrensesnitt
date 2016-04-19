@@ -40,11 +40,7 @@ public class RabbitMessaging implements MessageBroker {
             String jsonValue = new ObjectMapper().writeValueAsString(event);
             Message message = new Message(jsonValue.getBytes(), messageProperties);
             Message response = rabbitTemplate.sendAndReceive(route, message);
-            if (response != null) {
-                return new String(response.getBody());
-            } else {
-                return "";
-            }
+            return new String(response.getBody());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "";

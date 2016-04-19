@@ -12,10 +12,12 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 @SpringApplicationConfiguration(classes = Application.class)
 @WebIntegrationTest(randomPort = true)
+@ActiveProfiles("mock")
 class AnsattControllerSpec extends Specification {
 
     @Autowired
