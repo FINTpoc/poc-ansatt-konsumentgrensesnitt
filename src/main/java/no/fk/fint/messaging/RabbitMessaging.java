@@ -29,7 +29,6 @@ public class RabbitMessaging implements MessageBroker {
         replyTimeout = 0;
     }
 
-    @Override
     public String sendAndReceive(Event<?> event) {
         rabbitTemplate.setReplyTimeout(replyTimeout);
         messageProperties.setCorrelationId(event.getId().getBytes());
@@ -43,6 +42,11 @@ public class RabbitMessaging implements MessageBroker {
             e.printStackTrace();
             return "";
         }
+    }
+
+    @Override
+    public <T> T sendAndReceive(Event<?> event, Class<T> responseType) {
+        return null;
     }
 
     @Override

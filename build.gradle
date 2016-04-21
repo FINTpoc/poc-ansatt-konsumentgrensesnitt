@@ -15,7 +15,7 @@ apply plugin: 'groovy'
 apply plugin: 'spring-boot'
 
 jar {
-    baseName = 'employee-konsumentgrensesnitt-poc'
+    baseName = 'ansatt-konsumentgrensesnitt-poc'
     version = '0.0.1-SNAPSHOT'
 }
 
@@ -29,7 +29,7 @@ repositories {
 
 
 dependencies {
-    compile('no.fk:employee-modell-poc:1.0-SNAPSHOT')
+    compile('no.fk:ansatt-modell-poc:1.0-SNAPSHOT')
     compile('no.fk:event-modell-poc:1.0-SNAPSHOT')
 
     compile('org.springframework.boot:spring-boot-devtools')

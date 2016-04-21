@@ -2,12 +2,13 @@ package no.fk.fint.messaging
 
 import no.fk.event.Event
 import no.fk.event.Type
-import no.fk.fint.util.Employees
+import org.junit.Ignore
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageProperties
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import spock.lang.Specification
 
+@Ignore
 class RabbitMessagingSpec extends Specification {
 
     def "Send and receive an event"() {

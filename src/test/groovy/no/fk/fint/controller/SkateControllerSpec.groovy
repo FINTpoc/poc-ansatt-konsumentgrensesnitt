@@ -3,12 +3,14 @@ package no.fk.fint.controller
 import no.fk.fint.Application
 import no.skate.Kjonn
 import no.skate.Sivilstand
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.boot.test.TestRestTemplate
 import org.springframework.boot.test.WebIntegrationTest
 import spock.lang.Specification
 
+@Ignore
 @SpringApplicationConfiguration(classes = Application.class)
 @WebIntegrationTest(randomPort = true)
 class SkateControllerSpec extends Specification {

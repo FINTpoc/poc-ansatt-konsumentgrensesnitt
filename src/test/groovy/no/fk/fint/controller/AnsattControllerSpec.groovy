@@ -4,6 +4,7 @@ import no.fk.Ansatt
 import no.fk.fint.Application
 import no.fk.fint.employee.EmployeeController
 import no.skate.Kontaktinformasjon
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.SpringApplicationConfiguration
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
+@Ignore
 @SpringApplicationConfiguration(classes = Application.class)
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles("mock")
