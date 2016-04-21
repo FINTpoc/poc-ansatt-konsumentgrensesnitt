@@ -13,7 +13,7 @@ class RabbitMessagingSpec extends Specification {
     def "Send and receive an event"() {
         given:
         def rabbitTemplate = Mock(RabbitTemplate)
-        def rabbitMessaging = new RabbitMessaging(rabbitTemplate: rabbitTemplate, route: "test")
+        def rabbitMessaging = new RabbitMessaging(rabbitTemplate: rabbitTemplate)
         def event = new Event<>(type: Type.REQUEST, verb: "getEmployees", data: Employees.getEmployees())
 
         when:
@@ -24,4 +24,5 @@ class RabbitMessagingSpec extends Specification {
         1 * rabbitTemplate.sendAndReceive(_ as String, _ as Message) >> new Message("test-message".getBytes(), new MessageProperties())
         response == "test-message"
     }
+    
 }

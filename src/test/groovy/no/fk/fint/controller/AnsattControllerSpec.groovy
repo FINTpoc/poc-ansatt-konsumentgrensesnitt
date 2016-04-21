@@ -2,6 +2,7 @@ package no.fk.fint.controller
 
 import no.fk.Ansatt
 import no.fk.fint.Application
+import no.fk.fint.employee.EmployeeController
 import no.skate.Kontaktinformasjon
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -21,7 +22,7 @@ import spock.lang.Specification
 class AnsattControllerSpec extends Specification {
 
     @Autowired
-    private AnsattController ansattController
+    private EmployeeController ansattController
 
     @Value('${local.server.port}')
     private int port
@@ -58,7 +59,7 @@ class AnsattControllerSpec extends Specification {
 
         then:
         ansatt != null
-        //ansatt.getNavn().getFornavn() == "Ole"
+        //employee.getNavn().getFornavn() == "Ole"
     }
 
     def "Oppdater ansatt"() {

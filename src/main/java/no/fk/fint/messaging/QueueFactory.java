@@ -1,22 +1,16 @@
 package no.fk.fint.messaging;
 
-public class QueueFactory {
+public enum QueueFactory {
+    ;
 
-    private final String inQueueTemplate = "fint:%s:ansatt:in";
-    private final String outQueueTemplate = "fint:%s:ansatt:out";
-    private final String inQueue;
-    private final String outQueue;
+    private static final String IN_QUEUE_TEMPLATE = "fint:%s:employee:in";
+    private static final String OUT_QUEUE_TEMPLATE = "fint:%s:employee:out";
 
-    public QueueFactory(String orgID) {
-        inQueue = String.format(inQueueTemplate, orgID);
-        outQueue = String.format(outQueueTemplate, orgID);
+    public static String getInQueue(String orgId) {
+        return String.format(IN_QUEUE_TEMPLATE, orgId);
     }
 
-    public String getOutQueue() {
-        return outQueue;
-    }
-
-    public String getInQueue() {
-        return inQueue;
+    public static String getOutQueue(String orgId) {
+        return String.format(OUT_QUEUE_TEMPLATE, orgId);
     }
 }

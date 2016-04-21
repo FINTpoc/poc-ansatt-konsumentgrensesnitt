@@ -1,4 +1,4 @@
-package no.fk.fint.controller;
+package no.fk.fint.skate;
 
 import io.swagger.annotations.Api;
 import no.skate.Kjonn;

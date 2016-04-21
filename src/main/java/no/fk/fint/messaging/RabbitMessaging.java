@@ -3,7 +3,6 @@ package no.fk.fint.messaging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.fk.Ansatt;
 import no.fk.event.Event;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -24,7 +23,6 @@ public class RabbitMessaging implements MessageBroker {
 
     private long replyTimeout;
     private MessageProperties messageProperties;
-    private String route;
 
     public RabbitMessaging() {
         messageProperties = new MessageProperties();
@@ -32,24 +30,19 @@ public class RabbitMessaging implements MessageBroker {
     }
 
     @Override
-    public String sendAndReceive(Event<Ansatt> event) {
+    public String sendAndReceive(Event<?> event) {
         rabbitTemplate.setReplyTimeout(replyTimeout);
         messageProperties.setCorrelationId(event.getId().getBytes());
 
         try {
             String jsonValue = new ObjectMapper().writeValueAsString(event);
             Message message = new Message(jsonValue.getBytes(), messageProperties);
-            Message response = rabbitTemplate.sendAndReceive(route, message);
+            Message response = rabbitTemplate.sendAndReceive(QueueFactory.getInQueue(event.getOrgId()), message);
             return new String(response.getBody());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "";
         }
-    }
-
-    @Override
-    public void setRoute(String route) {
-        this.route = route;
     }
 
     @Override

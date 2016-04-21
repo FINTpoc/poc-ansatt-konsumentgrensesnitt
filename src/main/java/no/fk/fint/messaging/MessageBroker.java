@@ -1,10 +1,11 @@
 package no.fk.fint.messaging;
 
-import no.fk.Ansatt;
 import no.fk.event.Event;
 
 public interface MessageBroker {
-    String sendAndReceive(Event<Ansatt> event);
-    void setRoute(String route);
+
+    <T> T sendAndReceive(Event<?> event, Class<T> responseType);
+
     void setReplyTimeout(long replyTimeout);
+
 }

@@ -1,5 +1,5 @@
 konsumentgrensesnitt:
- image: "fint/ansatt-konsumentgrensesnitt-poc"
+ image: "fint/employee-konsumentgrensesnitt-poc"
  ports:
   - "8080:8080"
 
