@@ -1,6 +1,7 @@
 package no.fk.fint.employee;
 
 import no.fk.Ansatt;
+import no.fk.event.EventResponse;
 import no.skate.Identifikator;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface EmployeeService {
 
     List<Ansatt> getEmployees(String orgId, String navn);
 
-    Ansatt getEmployee(Identifikator identifikator);
+    Ansatt getEmployee(String orgId, Identifikator identifikator);
 
-    void updateEmployee(String orgId, Ansatt ansatt);
+    EventResponse updateEmployee(String orgId, Ansatt ansatt);
 }

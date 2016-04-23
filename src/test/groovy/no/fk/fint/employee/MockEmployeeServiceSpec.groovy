@@ -30,7 +30,7 @@ class MockEmployeeServiceSpec extends Specification {
 
     def "Get employee by identifikatortype and id"() {
         when:
-        def employee = mockEmployeeService.getEmployee(new Identifikator("fodselsnummer", "12345678901"))
+        def employee = mockEmployeeService.getEmployee("test-orgId", new Identifikator("fodselsnummer", "12345678901"))
 
         then:
         employee.getNavn().getFornavn() == "Ole"
@@ -42,10 +42,11 @@ class MockEmployeeServiceSpec extends Specification {
         employee.getKontaktinformasjon().setEpostadresse("test@test.com")
 
         when:
-        mockEmployeeService.updateEmployee("test-orgid", employee)
-        def existingEmployee = mockEmployeeService.getEmployee(employee.getIdentifikatorer().get(0))
+        def response = mockEmployeeService.updateEmployee("test-orgId", employee)
+        def existingEmployee = mockEmployeeService.getEmployee("test-orgId", employee.getIdentifikatorer().get(0))
 
         then:
+        response.getStatus() == "ok"
         existingEmployee.getKontaktinformasjon().getEpostadresse() == "test@test.com"
     }
 }

@@ -23,13 +23,13 @@ public class EmployeeController {
 
     @ApiOperation("Henter alle ansatte")
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<Ansatt> getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String navn) {
+    public Collection<Ansatt> getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String name) {
         log.info("OrgId: {}", orgId);
-        log.info("getEmployees - navn: {}", navn);
-        if (navn == null) {
+        log.info("getEmployees - name: {}", name);
+        if (name == null) {
             return employeeService.getEmployees(orgId);
         } else {
-            return employeeService.getEmployees(orgId, navn);
+            return employeeService.getEmployees(orgId, name);
         }
     }
 
@@ -37,7 +37,7 @@ public class EmployeeController {
     public Ansatt getEmployee(@RequestHeader("x-org-id") String orgId, @PathVariable String identifikatortype, @PathVariable String id) {
         log.info("OrgId: {}", orgId);
         log.info("getEmployee - identifikatorType: {}, id: {}", identifikatortype, id);
-        return employeeService.getEmployee(new Identifikator(identifikatortype, id));
+        return employeeService.getEmployee(orgId, new Identifikator(identifikatortype, id));
     }
 
     @RequestMapping(method = RequestMethod.PUT)

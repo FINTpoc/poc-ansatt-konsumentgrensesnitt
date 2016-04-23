@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/skate")
+@RequestMapping("/skate/vokabular")
 @Api(tags = "Skate")
 public class SkateController {
 
-    @RequestMapping(value = "/vokabular/sivilstand", method = RequestMethod.GET)
+    @RequestMapping(value = "/sivilstand", method = RequestMethod.GET)
     public Sivilstand[] sivilstand() {
         return Sivilstand.values();
     }
 
-    @RequestMapping(value = "/vokabular/kjonn", method = RequestMethod.GET)
+    @RequestMapping(value = "/kjonn", method = RequestMethod.GET)
     public Kjonn[] kjonn() {
         return Kjonn.values();
     }

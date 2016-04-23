@@ -2,7 +2,9 @@ package no.fk.fint.employee;
 
 import com.google.common.collect.Lists;
 import no.fk.Ansatt;
+import no.fk.event.EventResponse;
 import no.skate.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Profile("mock")
 @Service
 public class MockEmployeeService implements EmployeeService {
     private final Map<Identifikator, Ansatt> employees = new HashMap<>();
@@ -49,8 +52,13 @@ public class MockEmployeeService implements EmployeeService {
         employees.put(pal.getIdentifikatorer().get(0), pal);
     }
 
-    public List<Ansatt> getEmployees(String orgId) {
+    public List<Ansatt> getEmployees() {
         return Lists.newArrayList(employees.values());
+    }
+
+    @Override
+    public List<Ansatt> getEmployees(String orgId) {
+        return getEmployees();
     }
 
     @Override
@@ -64,15 +72,16 @@ public class MockEmployeeService implements EmployeeService {
     }
 
     @Override
-    public Ansatt getEmployee(Identifikator identifikator) {
+    public Ansatt getEmployee(String orgId, Identifikator identifikator) {
         return employees.get(identifikator);
     }
 
     @Override
-    public void updateEmployee(String orgId, Ansatt employee) {
+    public EventResponse updateEmployee(String orgId, Ansatt employee) {
         Identifikator identifikator = employee.getIdentifikatorer().get(0);
         Ansatt existingEmployee = employees.get(identifikator);
         existingEmployee.setKontaktinformasjon(employee.getKontaktinformasjon());
+        return new EventResponse("ok", "ansatt oppdatert");
     }
 
 

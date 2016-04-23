@@ -6,6 +6,4 @@ public interface MessageBroker {
 
     <T> T sendAndReceive(Event<?> event, Class<T> responseType);
 
-    void setReplyTimeout(long replyTimeout);
-
 }

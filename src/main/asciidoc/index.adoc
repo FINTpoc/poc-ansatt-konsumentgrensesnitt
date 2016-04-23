@@ -1,0 +1,69 @@
+= Ansatt konsumentgrensesnitt
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:seclinks:
+
+'''
+
+== Ansatte
+
+=== GET /ansatte
+Henter ut alle ansatte.
+
+==== Request
+include::{snippets}/ansatte/getAllEmployees/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getAllEmployees/http-response.adoc[]
+
+=== GET /ansatte?name={navn}
+Søk etter ansatt med fornavn/etternavn.
+
+==== Request
+include::{snippets}/ansatte/getEmployees/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getEmployees/http-response.adoc[]
+
+=== GET /ansatte/{identifikatortype}/{id}
+Hent ansatt med Identifikator.
+
+==== Request
+include::{snippets}/ansatte/getEmployee/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getEmployee/http-response.adoc[]
+
+=== PUT /ansatte
+Oppdater ansatt.
+
+==== Request
+include::{snippets}/ansatte/updateEmployee/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/updateEmployee/http-response.adoc[]
+
+'''
+
+== Skate vokabular
+
+=== GET /skate/vokabular/sivilstand
+Hent ut alle sivilstand-verdier.
+
+==== Request
+include::{snippets}/skate/vokabular/getMaritalStatus/curl-request.adoc[]
+
+==== Response
+include::{snippets}/skate/vokabular/getMaritalStatus/http-response.adoc[]
+
+=== GET /skate/vokabular/kjonn
+Hent ut alle kjønn.
+
+==== Request
+include::{snippets}/skate/vokabular/getGender/curl-request.adoc[]
+
+==== Response
+include::{snippets}/skate/vokabular/getGender/http-response.adoc[]
