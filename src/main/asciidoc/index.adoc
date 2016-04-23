@@ -10,6 +10,22 @@
 
 == Ansatte
 
+=== Ansatt xsd
+
+==== Request
+include::{snippets}/contracts/ansatt.xsd/curl-request.adoc[]
+
+==== Response
+include::{snippets}/contracts/ansatt.xsd/http-response.adoc[]
+
+=== Person xsd
+
+==== Request
+include::{snippets}/contracts/person.xsd/curl-request.adoc[]
+
+==== Response
+include::{snippets}/contracts/person.xsd/http-response.adoc[]
+
 === GET /ansatte
 Henter ut alle ansatte.
 
@@ -67,3 +83,13 @@ include::{snippets}/skate/vokabular/getGender/curl-request.adoc[]
 
 ==== Response
 include::{snippets}/skate/vokabular/getGender/http-response.adoc[]
+
+'''
+
+== Event xsd
+
+=== Request
+include::{snippets}/contracts/event.xsd/curl-request.adoc[]
+
+=== Response
+include::{snippets}/contracts/event.xsd/http-response.adoc[]
