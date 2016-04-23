@@ -6,8 +6,6 @@
 :toclevels: 4
 :seclinks:
 
-'''
-
 == Ansatte
 
 === Ansatt xsd

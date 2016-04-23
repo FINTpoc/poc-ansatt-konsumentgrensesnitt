@@ -62,12 +62,12 @@ public class MockEmployeeService implements EmployeeService {
     }
 
     @Override
-    public List<Ansatt> getEmployees(String orgId, String navn) {
-        String lowerCaseNavn = navn.toLowerCase();
+    public List<Ansatt> getEmployees(String orgId, String name) {
+        String lowerCaseName = name.toLowerCase();
         return employees.values().stream().filter(employee -> {
             String firstName = employee.getNavn().getFornavn().toLowerCase();
             String lastName = employee.getNavn().getEtternavn().toLowerCase();
-            return (firstName.equals(lowerCaseNavn) || lastName.equals(lowerCaseNavn));
+            return (firstName.equals(lowerCaseName) || lastName.equals(lowerCaseName));
         }).collect(Collectors.toList());
     }
 

@@ -27,6 +27,6 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfo("", "", "1.0", "", new Contact("", "", ""), "", "");
+        return new ApiInfo("ansatt-konsumentgrensesnitt-poc", "", "1.0", "", new Contact("", "", ""), "", "");
     }
 }
