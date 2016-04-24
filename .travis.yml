@@ -18,7 +18,7 @@ before_install:
   - ./gradlew webjar install
   - cd ..
 install: /bin/true
-install:
+script:
  - ./gradlew build
 
 
