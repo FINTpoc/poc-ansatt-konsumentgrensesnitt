@@ -16,7 +16,7 @@ import java.util.Collection;
 @Api(tags = "Ansatte")
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:9000")
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "/ansatte", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public class EmployeeController {
     private static final String CACHE_EMPLOYEE = "employee";
