@@ -16,6 +16,7 @@ before_install:
   - bower install
   - grunt build
   - ./gradlew webjar install
+  - cd ..
 script:
  - ./gradlew build
 
