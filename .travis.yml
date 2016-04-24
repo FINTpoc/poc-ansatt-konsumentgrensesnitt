@@ -11,7 +11,6 @@ before_install:
   - git clone --depth 1 https://github.com/FINTprosjektet/ansatt-modell-poc.git
   - ./gradlew -b ansatt-modell-poc/build.gradle
   - git clone --depth 1 https://github.com/FINTprosjektet/eksempel-konsument-adressebok.git
-  - ./gradlew -b eksempel-konsument-adressebok/build.gradle
   - cd eksempel-konsument-adressebok
   - npm install
   - bower install
