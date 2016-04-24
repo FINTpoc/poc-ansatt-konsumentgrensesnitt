@@ -17,8 +17,9 @@ before_install:
   - grunt build
   - ./gradlew webjar install
   - cd ..
-script:
- - ./gradlew clean build
+install: /bin/true
+install:
+ - ./gradlew build
 
 
 
