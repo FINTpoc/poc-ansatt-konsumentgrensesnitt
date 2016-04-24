@@ -1,10 +1,10 @@
 konsumentgrensesnitt:
- image: "fint/employee-konsumentgrensesnitt-poc"
+ image: "fint/ansatt-konsumentgrensesnitt-poc"
  ports:
   - "8080:8080"
 
 konsumentgrensesnitt-mock:
- image: "fint/employee-konsumentgrensesnitt-poc"
+ image: "fint/ansatt-konsumentgrensesnitt-poc"
  ports:
   - "8081:8080"
  environment:
