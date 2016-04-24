@@ -1,6 +1,6 @@
 # Ansatt konsumentgrensesnitt
 
-[![Build Status](https://travis-ci.org/FINTprosjektet/ansatt-konsumentgrensesnitt-poc.svg?branch=feature%2Fevent-handling)](https://travis-ci.org/FINTprosjektet/ansatt-konsumentgrensesnitt-poc)
+[![Build Status](https://travis-ci.org/FINTprosjektet/ansatt-konsumentgrensesnitt-poc.svg?branch=master)](https://travis-ci.org/FINTprosjektet/ansatt-konsumentgrensesnitt-poc)
 
 RabbitMQ integration tests:
 ```
