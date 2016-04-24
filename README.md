@@ -1,4 +1,4 @@
-# Ansatt konsumergrensesnitt
+# Ansatt konsumentgrensesnitt
 
 RabbitMQ integration tests:
 ```

@@ -18,8 +18,7 @@ import spock.lang.Specification
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringApplicationConfiguration(classes = Application.class)
@@ -94,6 +93,15 @@ class EmployeeControllerSpec extends Specification {
                 .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isOk())
                 .andDo(document("ansatte/updateEmployee", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+    }
 
+    def "Clear cache"() {
+        when:
+        def path = "/ansatte/cache"
+
+        then:
+        mockMvc.perform(delete(path))
+                .andExpect(status().isOk())
+                .andDo(document("ansatte/cache"))
     }
 }

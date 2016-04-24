@@ -6,6 +6,8 @@
 :toclevels: 4
 :seclinks:
 
+link:/swagger-ui.html[Swagger API dokumentasjon]
+
 == Ansatte
 
 === Ansatt xsd
@@ -59,6 +61,15 @@ include::{snippets}/ansatte/updateEmployee/curl-request.adoc[]
 
 ==== Response
 include::{snippets}/ansatte/updateEmployee/http-response.adoc[]
+
+=== DELETE /ansatte/cache
+Sletter ansatt-cache.
+
+==== Request
+include::{snippets}/ansatte/cache/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/cache/http-response.adoc[]
 
 '''
 
