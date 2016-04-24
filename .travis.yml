@@ -4,7 +4,8 @@ jdk:
 before_install:
   - curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
   - sudo apt-get install -y nodejs
-  - npm install -g npm@2 bower grunt-cli grunt
+  - npm install -g npm@2
+  - npm install -g bower grunt-cli grunt
   - git clone --depth 1 https://github.com/FINTprosjektet/event-modell-poc.git
   - ./gradlew -b event-modell-poc/build.gradle
   - git clone --depth 1 https://github.com/FINTprosjektet/ansatt-modell-poc.git
