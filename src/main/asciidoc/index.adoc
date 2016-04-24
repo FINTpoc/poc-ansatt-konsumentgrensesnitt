@@ -1,0 +1,104 @@
+= Ansatt konsumentgrensesnitt
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:seclinks:
+
+link:/swagger-ui.html[Swagger API dokumentasjon]
+
+== Ansatte
+
+=== Ansatt xsd
+
+==== Request
+include::{snippets}/contracts/ansatt.xsd/curl-request.adoc[]
+
+==== Response
+include::{snippets}/contracts/ansatt.xsd/http-response.adoc[]
+
+=== Person xsd
+
+==== Request
+include::{snippets}/contracts/person.xsd/curl-request.adoc[]
+
+==== Response
+include::{snippets}/contracts/person.xsd/http-response.adoc[]
+
+=== GET /ansatte
+Henter ut alle ansatte.
+
+==== Request
+include::{snippets}/ansatte/getAllEmployees/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getAllEmployees/http-response.adoc[]
+
+=== GET /ansatte?name={navn}
+Søk etter ansatt med fornavn/etternavn.
+
+==== Request
+include::{snippets}/ansatte/getEmployees/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getEmployees/http-response.adoc[]
+
+=== GET /ansatte/{identifikatortype}/{id}
+Hent ansatt med Identifikator.
+
+==== Request
+include::{snippets}/ansatte/getEmployee/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/getEmployee/http-response.adoc[]
+
+=== PUT /ansatte
+Oppdater ansatt.
+
+==== Request
+include::{snippets}/ansatte/updateEmployee/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/updateEmployee/http-response.adoc[]
+
+=== DELETE /ansatte/cache
+Sletter ansatt-cache.
+
+==== Request
+include::{snippets}/ansatte/cache/curl-request.adoc[]
+
+==== Response
+include::{snippets}/ansatte/cache/http-response.adoc[]
+
+'''
+
+== Skate vokabular
+
+=== GET /skate/vokabular/sivilstand
+Hent ut alle sivilstand-verdier.
+
+==== Request
+include::{snippets}/skate/vokabular/getMaritalStatus/curl-request.adoc[]
+
+==== Response
+include::{snippets}/skate/vokabular/getMaritalStatus/http-response.adoc[]
+
+=== GET /skate/vokabular/kjonn
+Hent ut alle kjønn.
+
+==== Request
+include::{snippets}/skate/vokabular/getGender/curl-request.adoc[]
+
+==== Response
+include::{snippets}/skate/vokabular/getGender/http-response.adoc[]
+
+'''
+
+== Event xsd
+
+=== Request
+include::{snippets}/contracts/event.xsd/curl-request.adoc[]
+
+=== Response
+include::{snippets}/contracts/event.xsd/http-response.adoc[]

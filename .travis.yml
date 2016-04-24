@@ -1,0 +1,10 @@
+language: java
+jdk:
+ - oraclejdk8
+before_install:
+  - git clone --depth 1 https://github.com/FINTprosjektet/event-modell-poc.git
+  - ./gradlew -b event-modell-poc/build.gradle
+  - git clone --depth 1 https://github.com/FINTprosjektet/ansatt-modell-poc.git
+  - ./gradlew -b ansatt-modell-poc/build.gradle
+script:
+ - ./gradlew build

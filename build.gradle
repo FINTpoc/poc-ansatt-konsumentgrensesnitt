@@ -10,14 +10,17 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.asciidoctor.convert" version "1.5.2"
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'spring-boot'
-
-jar {
-    baseName = 'ansatt-konsumentgrensesnitt-poc'
-    version = '0.0.1-SNAPSHOT'
-}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,9 +30,9 @@ repositories {
     mavenLocal()
 }
 
-
 dependencies {
     compile('no.fk:ansatt-modell-poc:1.0-SNAPSHOT')
+    compile('no.fk:event-modell-poc:1.0-SNAPSHOT')
 
     compile('org.springframework.boot:spring-boot-devtools')
     compile('org.springframework.boot:spring-boot-starter-web')
@@ -42,9 +45,35 @@ dependencies {
     compile('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.7.3')
 
     testCompile('org.spockframework:spock-spring:1.0-groovy-2.4')
+    testCompile('cglib:cglib-nodep:3.2.2')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.1.RELEASE'
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
+}
+
+bootRun {
+    systemProperties System.properties
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    attributes 'snippets': snippetsDir
+    inputs.dir snippetsDir
+    dependsOn test
+    sourceDir 'src/main/asciidoc'
+}
+
+jar {
+    baseName = 'ansatt-konsumentgrensesnitt-poc'
+    version = '0.0.1-SNAPSHOT'
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
 }

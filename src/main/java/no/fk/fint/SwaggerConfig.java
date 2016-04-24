@@ -27,6 +27,6 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfo("", "", "1.0", "", new Contact("", "", ""), "", "");
+        return new ApiInfo("Ansatt konsumentgrensesnitt", "<a href='/docs/index.html'>API dokumentasjon med eksempler</a>", "1.0", "", new Contact("", "", ""), "", "");
     }
 }
