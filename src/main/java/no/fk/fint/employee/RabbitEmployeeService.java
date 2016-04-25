@@ -37,7 +37,7 @@ public class RabbitEmployeeService implements EmployeeService {
         return employees.stream().filter(employee -> {
             String firstName = employee.getNavn().getFornavn().toLowerCase();
             String lastName = employee.getNavn().getEtternavn().toLowerCase();
-            return (searchName.equals(firstName) || searchName.equals(lastName));
+            return (searchName.contains(firstName) || searchName.contains(lastName));
         }).collect(Collectors.toList());
     }
 
