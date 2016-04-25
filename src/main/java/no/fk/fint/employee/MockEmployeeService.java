@@ -67,7 +67,7 @@ public class MockEmployeeService implements EmployeeService {
         return employees.values().stream().filter(employee -> {
             String firstName = employee.getNavn().getFornavn().toLowerCase();
             String lastName = employee.getNavn().getEtternavn().toLowerCase();
-            return (firstName.equals(lowerCaseName) || lastName.equals(lowerCaseName));
+            return (firstName.contains(lowerCaseName) || lastName.contains(lowerCaseName));
         }).collect(Collectors.toList());
     }
 
