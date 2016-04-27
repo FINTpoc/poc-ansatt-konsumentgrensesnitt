@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,10 +45,9 @@ public class RabbitEmployeeService implements EmployeeService {
 
     @Override
     public Ansatt getEmployee(String orgId, Identifikator identifikator) {
-        Event event = new RequestEvent(orgId, Events.GET_EMPLOYEE);
-        ArrayList arrayList = new ArrayList();
-        arrayList.add(identifikator);
-        event.setData(arrayList);
+        Event<Identifikator> event = new RequestEvent<>(orgId, Events.GET_EMPLOYEE);
+        event.addData(identifikator);
+
         Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
         Ansatt[] employee = new ObjectMapper().convertValue(eventResponse.getData(), Ansatt[].class);
         return employee[0];
@@ -57,10 +55,8 @@ public class RabbitEmployeeService implements EmployeeService {
 
     @Override
     public EventResponse updateEmployee(String orgId, Ansatt ansatt) {
-        Event event = new RequestEvent(orgId, Events.UPDATE_EMPLOYEE);
-        ArrayList arrayList = new ArrayList();
-        arrayList.add(ansatt);
-        event.setData(arrayList);
+        Event<Ansatt> event = new RequestEvent<>(orgId, Events.UPDATE_EMPLOYEE);
+        event.addData(ansatt);
 
         Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
         EventResponse[] responseReturn = new ObjectMapper().convertValue(eventResponse.getData(), EventResponse[].class);
