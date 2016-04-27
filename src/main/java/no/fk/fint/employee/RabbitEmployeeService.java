@@ -1,5 +1,6 @@
 package no.fk.fint.employee;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.fk.Ansatt;
 import no.fk.event.Event;
 import no.fk.event.EventResponse;
@@ -26,7 +27,8 @@ public class RabbitEmployeeService implements EmployeeService {
     @Override
     public List<Ansatt> getEmployees(String orgId) {
         Event event = new RequestEvent(orgId, Events.GET_EMPLOYEES);
-        Ansatt[] employees = rabbitMessaging.sendAndReceive(event, Ansatt[].class);
+        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        Ansatt[] employees = new ObjectMapper().convertValue(eventResponse.getData(), Ansatt[].class);
         return Arrays.asList(employees);
     }
 
@@ -37,19 +39,27 @@ public class RabbitEmployeeService implements EmployeeService {
         return employees.stream().filter(employee -> {
             String firstName = employee.getNavn().getFornavn().toLowerCase();
             String lastName = employee.getNavn().getEtternavn().toLowerCase();
-            return (searchName.contains(firstName) || searchName.contains(lastName));
+            return ((firstName.contains(searchName) || lastName.contains(searchName)) || (searchName.contains(firstName) || searchName.contains(lastName)));
         }).collect(Collectors.toList());
     }
 
     @Override
     public Ansatt getEmployee(String orgId, Identifikator identifikator) {
         Event<Identifikator> event = new RequestEvent<>(orgId, Events.GET_EMPLOYEE);
-        return rabbitMessaging.sendAndReceive(event, Ansatt.class);
+        event.addData(identifikator);
+
+        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        Ansatt[] employee = new ObjectMapper().convertValue(eventResponse.getData(), Ansatt[].class);
+        return employee[0];
     }
 
     @Override
     public EventResponse updateEmployee(String orgId, Ansatt ansatt) {
         Event<Ansatt> event = new RequestEvent<>(orgId, Events.UPDATE_EMPLOYEE);
-        return rabbitMessaging.sendAndReceive(event, EventResponse.class);
+        event.addData(ansatt);
+
+        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        EventResponse[] responseReturn = new ObjectMapper().convertValue(eventResponse.getData(), EventResponse[].class);
+        return responseReturn[0];
     }
 }

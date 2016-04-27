@@ -13,12 +13,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 @Slf4j
 @Component
 @Scope("prototype")
 @Profile("!mock")
 public class RabbitMessaging implements MessageBroker {
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     @Value("${rabbitmq.timeout:300000}")
     private long timeout;
@@ -33,7 +36,9 @@ public class RabbitMessaging implements MessageBroker {
         messageProperties.setCorrelationId(event.getId().getBytes());
 
         try {
-            String jsonValue = new ObjectMapper().writeValueAsString(event);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setDateFormat(dateFormat);
+            String jsonValue = objectMapper.writeValueAsString(event);
             Message message = new Message(jsonValue.getBytes(), messageProperties);
             Message response = rabbitTemplate.sendAndReceive(QueueFactory.getInQueue(event.getOrgId()), message);
             return new ObjectMapper().readValue(response.getBody(), responseType);
