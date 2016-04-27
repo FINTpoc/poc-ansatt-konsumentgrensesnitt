@@ -20,7 +20,7 @@ import java.io.IOException;
 @Profile("!mock")
 public class RabbitMessaging implements MessageBroker {
 
-    @Value("${rabbitmq.timeout:30000}")
+    @Value("${rabbitmq.timeout:300000}")
     private long timeout;
 
     @Autowired
