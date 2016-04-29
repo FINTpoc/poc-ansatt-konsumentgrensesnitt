@@ -6,9 +6,16 @@
 :toclevels: 4
 :seclinks:
 
-link:/swagger-ui.html[Swagger API dokumentasjon]
+link:/swagger-ui.html[API dokumentasjon med dynamisk testing av tjenestene]
 
-== Ansatte
+Dette er grensesnittet som tilgjengeliggjør tjenestene i felleskomponenten ansatt.
+
+== Ansatt
+
+Kontrakt for ansatt.
+Tjenester for å hente ut og oppdatere ansattinformasjon.
+
+Modellene er basert på Skate felles datakatalog-person.
 
 === Ansatt xsd
 
@@ -18,16 +25,9 @@ include::{snippets}/contracts/ansatt.xsd/curl-request.adoc[]
 ==== Response
 include::{snippets}/contracts/ansatt.xsd/http-response.adoc[]
 
-=== Person xsd
-
-==== Request
-include::{snippets}/contracts/person.xsd/curl-request.adoc[]
-
-==== Response
-include::{snippets}/contracts/person.xsd/http-response.adoc[]
-
 === GET /ansatte
-Henter ut alle ansatte.
+Henter ut alle ansatte basert på angitt fylkeskommune.
+Verdien hentes ut fra request header: _x-org-id_
 
 ==== Request
 include::{snippets}/ansatte/getAllEmployees/curl-request.adoc[]
@@ -36,7 +36,7 @@ include::{snippets}/ansatte/getAllEmployees/curl-request.adoc[]
 include::{snippets}/ansatte/getAllEmployees/http-response.adoc[]
 
 === GET /ansatte?name={navn}
-Søk etter ansatt med fornavn/etternavn.
+Søk etter ansatt basert på fornavn eller etternavn.
 
 ==== Request
 include::{snippets}/ansatte/getEmployees/curl-request.adoc[]
@@ -45,7 +45,11 @@ include::{snippets}/ansatte/getEmployees/curl-request.adoc[]
 include::{snippets}/ansatte/getEmployees/http-response.adoc[]
 
 === GET /ansatte/{identifikatortype}/{id}
-Hent ansatt med Identifikator.
+Hent ansatt med identifikatortype (f.eks. fødselsnummer eller ansattnummer) og identifikatorverdi.
+
+*Eksempel på ressurs:* +
+/ansatte/<identifikatortype/<identifikatorverdi> +
+/ansatte/ansattnummer/19300 +
 
 ==== Request
 include::{snippets}/ansatte/getEmployee/curl-request.adoc[]
@@ -54,7 +58,8 @@ include::{snippets}/ansatte/getEmployee/curl-request.adoc[]
 include::{snippets}/ansatte/getEmployee/http-response.adoc[]
 
 === PUT /ansatte
-Oppdater ansatt.
+Oppdater ansatt, eneste feltet som kan oppdateres i PoC er e-postadresse.
+Identifikator benyttes for å finne riktig ansatt.
 
 ==== Request
 include::{snippets}/ansatte/updateEmployee/curl-request.adoc[]
@@ -63,7 +68,8 @@ include::{snippets}/ansatte/updateEmployee/curl-request.adoc[]
 include::{snippets}/ansatte/updateEmployee/http-response.adoc[]
 
 === DELETE /ansatte/cache
-Sletter ansatt-cache.
+For å øke ytelsen vil verdiene fra kildesystemet bli cachet.
+Denne tjenesten sletter ansatt-cache.
 
 ==== Request
 include::{snippets}/ansatte/cache/curl-request.adoc[]
@@ -75,8 +81,18 @@ include::{snippets}/ansatte/cache/http-response.adoc[]
 
 == Skate vokabular
 
+Kontrakt for person.
+Basert på Skate felles datakatalog.
+
+=== Person xsd
+
+==== Request
+include::{snippets}/contracts/person.xsd/curl-request.adoc[]
+
+==== Response
+include::{snippets}/contracts/person.xsd/http-response.adoc[]
+
 === GET /skate/vokabular/sivilstand
-Hent ut alle sivilstand-verdier.
 
 ==== Request
 include::{snippets}/skate/vokabular/getMaritalStatus/curl-request.adoc[]
@@ -85,7 +101,6 @@ include::{snippets}/skate/vokabular/getMaritalStatus/curl-request.adoc[]
 include::{snippets}/skate/vokabular/getMaritalStatus/http-response.adoc[]
 
 === GET /skate/vokabular/kjonn
-Hent ut alle kjønn.
 
 ==== Request
 include::{snippets}/skate/vokabular/getGender/curl-request.adoc[]
@@ -96,6 +111,9 @@ include::{snippets}/skate/vokabular/getGender/http-response.adoc[]
 '''
 
 == Event xsd
+
+Kontrakt for event.
+Et generisk objekt for å håndtere hendelser.
 
 === Request
 include::{snippets}/contracts/event.xsd/curl-request.adoc[]
