@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @Api(tags = "Ansatte")
 @Slf4j
@@ -28,14 +29,31 @@ public class EmployeeController {
     @ApiOperation("Hent alle ansatte")
     @Cacheable(CACHE_EMPLOYEES)
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<Ansatt> getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String name) {
+    public /*Collection<Ansatt>*/ RestResponse getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String name) {
         log.info("OrgId: {}", orgId);
         log.info("getEmployees - name: {}", name);
+
+
+        if (name == null) {
+            List<Ansatt> employees = employeeService.getEmployees(orgId);
+            RestResponse restResponse = new RestResponse();
+            restResponse.setTotalResults(employees.size());
+            restResponse.setResults(employees);
+            log.info("restResponse: {}", restResponse.toString());
+            return restResponse; //employeeService.getEmployees(orgId);
+        } else {
+            return null; //employeeService.getEmployees(orgId, name);
+        }
+
+
+
+        /*
         if (name == null) {
             return employeeService.getEmployees(orgId);
         } else {
             return employeeService.getEmployees(orgId, name);
         }
+        */
     }
 
     @ApiOperation("Hent ansatt med identifikator")
