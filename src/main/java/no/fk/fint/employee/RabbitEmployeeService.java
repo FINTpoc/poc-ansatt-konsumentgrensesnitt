@@ -27,7 +27,7 @@ public class RabbitEmployeeService implements EmployeeService {
     @Override
     public List<Ansatt> getEmployees(String orgId) {
         Event event = new RequestEvent(orgId, Events.GET_EMPLOYEES);
-        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        Event eventResponse = rabbitMessaging.sendAndReceive(event);
         Ansatt[] employees = new ObjectMapper().convertValue(eventResponse.getData(), Ansatt[].class);
         return Arrays.asList(employees);
     }
@@ -48,7 +48,7 @@ public class RabbitEmployeeService implements EmployeeService {
         Event<Identifikator> event = new RequestEvent<>(orgId, Events.GET_EMPLOYEE);
         event.addData(identifikator);
 
-        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        Event eventResponse = rabbitMessaging.sendAndReceive(event);
         Ansatt[] employee = new ObjectMapper().convertValue(eventResponse.getData(), Ansatt[].class);
         return employee[0];
     }
@@ -58,7 +58,7 @@ public class RabbitEmployeeService implements EmployeeService {
         Event<Ansatt> event = new RequestEvent<>(orgId, Events.UPDATE_EMPLOYEE);
         event.addData(ansatt);
 
-        Event eventResponse = rabbitMessaging.sendAndReceive(event, Event.class);
+        Event eventResponse = rabbitMessaging.sendAndReceive(event);
         EventResponse[] responseReturn = new ObjectMapper().convertValue(eventResponse.getData(), EventResponse[].class);
         return responseReturn[0];
     }

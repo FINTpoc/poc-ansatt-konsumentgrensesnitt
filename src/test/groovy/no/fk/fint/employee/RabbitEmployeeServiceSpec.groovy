@@ -29,7 +29,7 @@ class RabbitEmployeeServiceSpec extends Specification {
         def employees = rabbitEmployeeService.getEmployees("test-orgId")
 
         then:
-        1 * rabbitMessaging.sendAndReceive(_ as Event, _ as Class) >> event
+        1 * rabbitMessaging.sendAndReceive(_ as Event) >> event
         employees.size() == 5
     }
 
@@ -42,7 +42,7 @@ class RabbitEmployeeServiceSpec extends Specification {
         def employees = rabbitEmployeeService.getEmployees("test-orgId", "trine")
 
         then:
-        1 * rabbitMessaging.sendAndReceive(_ as Event, _ as Class) >> event
+        1 * rabbitMessaging.sendAndReceive(_ as Event) >> event
         employees.size() == 1
         employees.get(0).getNavn().getFornavn() == "Trine"
     }
@@ -57,7 +57,7 @@ class RabbitEmployeeServiceSpec extends Specification {
         def employee = rabbitEmployeeService.getEmployee("test-orgId", id)
 
         then:
-        1 * rabbitMessaging.sendAndReceive(_ as Event, _ as Class) >> event
+        1 * rabbitMessaging.sendAndReceive(_ as Event) >> event
         employee.getNavn().getFornavn() == "Pål"
     }
 
@@ -70,7 +70,7 @@ class RabbitEmployeeServiceSpec extends Specification {
         def response = rabbitEmployeeService.updateEmployee("test-orgId", new Ansatt())
 
         then:
-        1 * rabbitMessaging.sendAndReceive(_ as Event, _ as Class) >> event
+        1 * rabbitMessaging.sendAndReceive(_ as Event) >> event
         response.getStatus() == "ok"
     }
 }

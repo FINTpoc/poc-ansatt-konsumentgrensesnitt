@@ -30,7 +30,7 @@ public class RabbitMessaging implements MessageBroker {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public <T> T sendAndReceive(Event<?> event, Class<T> responseType) {
+    public Event<?> sendAndReceive(Event<?> event) {
         MessageProperties messageProperties = new MessageProperties();
         rabbitTemplate.setReplyTimeout(timeout);
         messageProperties.setCorrelationId(event.getId().getBytes());
@@ -41,7 +41,11 @@ public class RabbitMessaging implements MessageBroker {
             String jsonValue = objectMapper.writeValueAsString(event);
             Message message = new Message(jsonValue.getBytes(), messageProperties);
             Message response = rabbitTemplate.sendAndReceive(QueueFactory.getInQueue(event.getOrgId()), message);
-            return new ObjectMapper().readValue(response.getBody(), responseType);
+            if (response == null) {
+                return new Event<>();
+            } else {
+                return new ObjectMapper().readValue(response.getBody(), Event.class);
+            }
         } catch (IOException e) {
             log.error("Exception when trying to send and receive a RabbitMQ message", e);
             return null;

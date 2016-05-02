@@ -4,6 +4,6 @@ import no.fk.event.Event;
 
 public interface MessageBroker {
 
-    <T> T sendAndReceive(Event<?> event, Class<T> responseType);
+    Event<?> sendAndReceive(Event<?> event);
 
 }

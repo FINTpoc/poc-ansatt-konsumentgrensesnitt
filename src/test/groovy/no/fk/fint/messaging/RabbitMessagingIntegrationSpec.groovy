@@ -26,7 +26,7 @@ class RabbitMessagingIntegrationSpec extends Specification {
         event.addData("test-message")
 
         when:
-        def response = rabbitMessaging.sendAndReceive(event, String)
+        def response = rabbitMessaging.sendAndReceive(event)
 
         then:
         response != null
