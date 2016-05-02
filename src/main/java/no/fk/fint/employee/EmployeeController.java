@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,23 +30,31 @@ public class EmployeeController {
     @ApiOperation("Hent alle ansatte")
     @Cacheable(CACHE_EMPLOYEES)
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<Ansatt> getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String name) {
+    public RestResponse getEmployees(@RequestHeader("x-org-id") String orgId, @RequestParam(required = false) String name) {
         log.info("OrgId: {}", orgId);
         log.info("getEmployees - name: {}", name);
+
+        Collection<Ansatt> result;
         if (name == null) {
-            return employeeService.getEmployees(orgId);
+            result =  employeeService.getEmployees(orgId);
         } else {
-            return employeeService.getEmployees(orgId, name);
+            result = employeeService.getEmployees(orgId, name);
         }
+        int totalResults = result.size();
+
+        return new RestResponse(totalResults, result);
     }
 
     @ApiOperation("Hent ansatt med identifikator")
     @Cacheable(CACHE_EMPLOYEE)
     @RequestMapping(value = "/{identifikatortype}/{id}", method = RequestMethod.GET)
-    public Ansatt getEmployee(@RequestHeader("x-org-id") String orgId, @PathVariable String identifikatortype, @PathVariable String id) {
+    public RestResponse getEmployee(@RequestHeader("x-org-id") String orgId, @PathVariable String identifikatortype, @PathVariable String id) {
         log.info("OrgId: {}", orgId);
         log.info("getEmployee - identifikatorType: {}, id: {}", identifikatortype, id);
-        return employeeService.getEmployee(orgId, new Identifikator(identifikatortype, id));
+
+        Collection<Ansatt> result = Arrays.asList(employeeService.getEmployee(orgId, new Identifikator(identifikatortype, id)));
+
+        return new RestResponse(result.size(), result);
     }
 
     @ApiOperation("Oppdater ansatt")
