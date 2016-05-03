@@ -10,6 +10,11 @@ konsumentgrensesnitt-mock:
  environment:
   spring.profiles.active: mock
 
+bluegarden-adapter:
+ image: "fint/ansatt-adapter-bluegarden"
+ ports:
+  - "8082:8080"
+
 rabbitmq:
   hostname: "rabbitmq-poc"
   image: "rabbitmq:3-management"
