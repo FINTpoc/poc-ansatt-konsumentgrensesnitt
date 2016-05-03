@@ -20,7 +20,7 @@ public class UserController {
             switch (orgId) {
                 case "hfk.no":
                     return Users.HFK.get();
-                case "rfk.no":
+                case "rogfk.no":
                     return Users.RFK.get();
                 default:
                     return new User(orgId);
