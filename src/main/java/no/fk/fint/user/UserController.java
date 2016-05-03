@@ -21,7 +21,9 @@ public class UserController {
                 case "hfk.no":
                     return Users.HFK.get();
                 case "rogfk.no":
-                    return Users.RFK.get();
+                    return Users.ROGFK.get();
+                case "vaf.no":
+                    return Users.VAF.get();
                 default:
                     return new User(orgId);
             }
