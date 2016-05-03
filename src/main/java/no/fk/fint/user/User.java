@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User {
     private String orgId;
+    private String logo;
+
+    public User(String orgId) {
+        this.orgId = orgId;
+    }
 }

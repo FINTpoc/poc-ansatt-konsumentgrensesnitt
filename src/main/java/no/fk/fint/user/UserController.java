@@ -14,9 +14,17 @@ public class UserController {
     @ApiOperation("Get user info")
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public User getUser(@RequestHeader(value = "x-org-id", required = false) String orgId) {
-        if (orgId == null)
+        if (orgId == null) {
             return new User("");
-        else
-            return new User(orgId);
+        } else {
+            switch (orgId) {
+                case "hfk.no":
+                    return Users.HFK.get();
+                case "rfk.no":
+                    return Users.RFK.get();
+                default:
+                    return new User(orgId);
+            }
+        }
     }
 }
